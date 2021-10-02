@@ -38,4 +38,3 @@ class TestCheckout:
 
     def test_applies_group_discount_to_pricier_products_first(self):
         assert checkout("XYZZ") == 62
-
