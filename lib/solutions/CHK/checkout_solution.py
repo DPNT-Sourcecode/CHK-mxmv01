@@ -17,7 +17,7 @@ class Product(Enum):
     H = 10
     I = 35
     J = 60
-    K = 80
+    K = 70
     L = 90
     M = 15
     N = 40
@@ -25,14 +25,14 @@ class Product(Enum):
     P = 50
     Q = 30
     R = 50
-    S = 30
+    S = 20
     T = 20
     U = 40
     V = 50
     W = 20
-    X = 90
-    Y = 10
-    Z = 50
+    X = 17
+    Y = 20
+    Z = 21
 
     def __init__(self, price: int) -> None:
         self._value_ = auto()
@@ -226,7 +226,7 @@ def get_offers() -> List[Offer]:
         Offer(MultiBuy([(Product.F, 3)]), GetFree(Product.F, 1)),
         Offer(MultiBuy([(Product.H, 5)]), FixPrice(Product.H, 5, 45)),
         Offer(MultiBuy([(Product.H, 10)]), FixPrice(Product.H, 10, 80)),
-        Offer(MultiBuy([(Product.K, 2)]), FixPrice(Product.K, 2, 150)),
+        Offer(MultiBuy([(Product.K, 2)]), FixPrice(Product.K, 2, 120)),
         Offer(MultiBuy([(Product.N, 3), (Product.M, 1)]), GetFree(Product.M, 1)),
         Offer(MultiBuy([(Product.P, 5)]), FixPrice(Product.P, 5, 200)),
         Offer(MultiBuy([(Product.Q, 3)]), FixPrice(Product.Q, 3, 80)),
@@ -255,6 +255,7 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
 
