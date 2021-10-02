@@ -76,51 +76,64 @@ class Offer:
     condition: Condition
     discount: Discount
 
+    def is_applicable(self, items: Dict[Product, int]) -> bool:
+        return self.condition.is_applicable(items)
+
+    def apply(self, items: Dict[Product, int]) -> int:
+        return self.discount.apply(items)
+
 
 class Basket:
 
     def __init__(self) -> None:
         self.items: Dict[Product, int] = {}
 
-    def add_item(self, product: Product):
+    def add_item(self, product: Product) -> None:
         count = self.items.get(product)
         if count is None:
             count = 0
         count += 1
         self.items[product] = count
 
-    def checkout(self):
+    def checkout(self, offers: List[Offer]) -> int:
         total = self._calculate_total()
+        discount = self._calculate_discount(offers)
+        return total - discount
 
-    def _calculate_total(self):
+    def _calculate_total(self) -> int:
         total = 0
         for product, count in self.items.items():
             total += product.value * count
         return total
 
-    def _calculate_discount(self):
-        pass
-
-    def calculate_total(self, offers: Dict[Product, List[Offer]]):
-        total = 0
-        for product, count in self.items.items():
-            if product in offers:
-                product_total = self._calculate_discounted_total(product, offers[product], count)
-            else:
-                product_total = self._calculate_full_price_total(product, count)
-            total += product_total
-        return total
-
-    def _calculate_discounted_total(self, product: Product, offers: List[Offer], count: int) -> int:
-        product_total = 0
+    def _calculate_discount(self, offers: List[Offer]) -> int:
+        items = self.items.copy()
+        discount = 0
         for offer in offers:
-            product_total += count // offer.count * offer.price
-            count = count % offer.count
-        product_total += self._calculate_full_price_total(product, count)
-        return product_total
+            while offer.is_applicable(items):
+                discount += offer.discount.apply(items)
+        return discount
 
-    def _calculate_full_price_total(self, product: Product, count: int) -> int:
-        return product.value * count
+    # def calculate_total(self, offers: Dict[Product, List[Offer]]):
+    #     total = 0
+    #     for product, count in self.items.items():
+    #         if product in offers:
+    #             product_total = self._calculate_discounted_total(product, offers[product], count)
+    #         else:
+    #             product_total = self._calculate_full_price_total(product, count)
+    #         total += product_total
+    #     return total
+    #
+    # def _calculate_discounted_total(self, product: Product, offers: List[Offer], count: int) -> int:
+    #     product_total = 0
+    #     for offer in offers:
+    #         product_total += count // offer.count * offer.price
+    #         count = count % offer.count
+    #     product_total += self._calculate_full_price_total(product, count)
+    #     return product_total
+    #
+    # def _calculate_full_price_total(self, product: Product, count: int) -> int:
+    #     return product.value * count
 
 
 def get_offers() -> List[Offer]:
@@ -139,7 +152,7 @@ def checkout(skus: str):
             basket.add_item(product)
     except UnknownProductException:
         return -1
-    return basket.calculate_total(get_offers())
+    return basket.checkout(get_offers())
 
 
 def parse_products(skus: str) -> Generator[Product, None, None]:
@@ -148,7 +161,3 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
-
-
-
-
