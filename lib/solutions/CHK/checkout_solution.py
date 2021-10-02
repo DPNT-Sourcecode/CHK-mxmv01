@@ -13,14 +13,10 @@ def checkout(skus: str):
 
 
 class Good(str):
-    A = "A"
-    B = "B"
-    C = "C"
-    D = "D"
-
-    @staticmethod
-    def parse(name: str):
-        
+    A = 50
+    B = 30
+    C = 20
+    D = 15
 
 
 class Basket:
@@ -34,5 +30,6 @@ class Basket:
             count = 0
         count += 1
         self.items[good] = count
+
 
 
