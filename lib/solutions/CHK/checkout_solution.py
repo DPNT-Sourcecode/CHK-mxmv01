@@ -5,8 +5,6 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Generator, List, Dict, Tuple
 
-from functools import reduce
-
 
 class Product(Enum):
     A = 50
@@ -73,6 +71,10 @@ class MultiBuy(Condition):
             items[product] -= count
 
 
+def sorted_from_pricier_to_cheaper(products):
+    return sorted(products, key=lambda product: product.price, reverse=True)
+
+
 @dataclass
 class GroupBuy(Condition):
     count: int
@@ -87,14 +89,11 @@ class GroupBuy(Condition):
 
     def applied(self, items: Dict[Product, int]) -> None:
         applied = 0
-        for product in self.sorted_from_pricier_to_cheaper():
+        for product in sorted_from_pricier_to_cheaper(self.products):
             if product in items:
                 while items[product] > 0 and applied < self.count:
                     items[product] -= 1
                     applied += 1
-
-    def sorted_from_pricier_to_cheaper(self):
-        return sorted(self.products, key=lambda product: product.price, reverse=True)
 
 
 class Discount(ABC):
@@ -146,9 +145,16 @@ class GroupFixPrice(Discount):
     price: int
 
     def apply(self, items: Dict[Product, int]) -> int:
-        discount = 0
-        if self.product in items and items[self.product] >= self.count:
-            discount = self.product.price * self.count - self.price
+        applied = 0
+        total = 0
+        for product in sorted_from_pricier_to_cheaper(self.products):
+            if product in items:
+                for i in range(min(items[product], self.count - applied)):
+                    total += product.price
+                    applied += 1
+            if applied == self.count:
+                break
+        discount = total - self.price
         return discount
 
     def per_item(self) -> float:
@@ -227,6 +233,8 @@ def get_offers() -> List[Offer]:
         Offer(MultiBuy([(Product.U, 4)]), GetFree(Product.U, 1)),
         Offer(MultiBuy([(Product.V, 2)]), FixPrice(Product.V, 2, 90)),
         Offer(MultiBuy([(Product.V, 3)]), FixPrice(Product.V, 3, 130)),
+        Offer(GroupBuy(3, [Product.S, Product.T, Product.X, Product.Y, Product.Z]),
+              GroupFixPrice([Product.S, Product.T, Product.X, Product.Y, Product.Z], 3, 45)),
     ], reverse=True)
 
 
@@ -246,4 +254,5 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
