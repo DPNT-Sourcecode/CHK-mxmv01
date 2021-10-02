@@ -1,6 +1,6 @@
 # noinspection PyUnusedLocal
 # skus = unicode string
-from enum import Enum, IntEnum
+from enum import IntEnum
 
 from typing import Generator
 
@@ -8,32 +8,32 @@ from typing import Generator
 def checkout(skus: str):
     basket = Basket()
     try:
-        for goods in parse_goods(skus):
-            basket.add_item(goods)
-    except UnknownGoodException:
+        for product in parse_products(skus):
+            basket.add_item(product)
+    except UnknownProductException:
         return -1
     return basket.calculate_total()
 
 
-class Goods(IntEnum):
+class Product(IntEnum):
     A = 50
     B = 30
     C = 20
     D = 15
 
 
-class UnknownGoodException(Exception):
+class UnknownProductException(Exception):
 
     def __init__(self, name: str) -> None:
-        super().__init__(f"Unknown goods found: {name}")
+        super().__init__(f"Unknown product found: {name}")
 
 
-def parse_goods(skus: str) -> Generator[Goods, None, None]:
+def parse_products(skus: str) -> Generator[Product, None, None]:
     for sku in list(skus):
         try:
-            yield Goods[sku]
+            yield Product[sku]
         except KeyError:
-            raise UnknownGoodException(sku)
+            raise UnknownProductException(sku)
 
 
 class Basket:
@@ -41,18 +41,19 @@ class Basket:
     def __init__(self) -> None:
         self.items = {}
 
-    def add_item(self, goods: Goods):
-        count = self.items.get(goods)
+    def add_item(self, product: Product):
+        count = self.items.get(product)
         if count is None:
             count = 0
         count += 1
-        self.items[goods] = count
+        self.items[product] = count
 
     def calculate_total(self):
         total = 0
-        for goods, count in self.items.items():
-            total += goods.value * count
+        for product, count in self.items.items():
+            total += product.value * count
         return total
+
 
 
 
