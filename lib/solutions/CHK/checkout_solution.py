@@ -50,6 +50,10 @@ class Discount(ABC):
     def apply(self, items: Dict[Product, int]) -> int:
         pass
 
+    @abstractmethod
+    def per_item(self) -> float:
+        pass
+
 
 @dataclass
 class FixPrice(Discount):
@@ -63,6 +67,9 @@ class FixPrice(Discount):
             items[self.product] -= self.count
             discount = self.product.value * self.count - self.price
         return discount
+
+    def per_item(self) -> float:
+        pass
 
 
 @dataclass
@@ -95,7 +102,7 @@ class Offer:
         return discount > 0, discount
 
     def __lt__(self, other):
-        return self.discount 
+        return self.discount < other.discount
 
 
 class Basket:
@@ -179,6 +186,7 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
 
