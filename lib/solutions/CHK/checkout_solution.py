@@ -2,7 +2,7 @@
 # skus = unicode string
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Generator, Dict
+from typing import Generator, Dict, List
 
 
 class Product(IntEnum):
@@ -10,6 +10,7 @@ class Product(IntEnum):
     B = 30
     C = 20
     D = 15
+    E = 40
 
 
 class UnknownProductException(Exception):
@@ -56,8 +57,8 @@ class Basket:
         return product.value * count
 
 
-def get_offers() -> Dict[Product, Offer]:
-    return {offer.product: offer for offer in [Offer(Product.A, 3, 130), Offer(Product.B, 2, 45)]}
+def get_offers() -> List[Offer]:
+    return [Offer(Product.A, 5, 130), Offer(Product.A, 3, 130), Offer(Product.B, 2, 45)]
 
 
 def checkout(skus: str):
@@ -76,3 +77,4 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
