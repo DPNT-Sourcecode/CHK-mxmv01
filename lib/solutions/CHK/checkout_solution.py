@@ -37,23 +37,23 @@ class Basket:
         count += 1
         self.items[product] = count
 
-    def calculate_discounted_total(self, offer: Offer, count: int) -> int:
-        offers_count = count // offer.count
-        full_price_count = count % offer.count
-        return offers_count * offer.price + self.calculate_full_price_total(offer.product, full_price_count)
-
-    def calculate_full_price_total(self, product: Product, count: int) -> int:
-        return product.value * count
-
     def calculate_total(self, offers: Dict[Product, Offer]):
         total = 0
         for product, count in self.items.items():
             if product in offers:
-                product_total = self.calculate_discounted_total(offers[product], count)
+                product_total = self._calculate_discounted_total(offers[product], count)
             else:
-                product_total = self.calculate_full_price_total(product, count)
+                product_total = self._calculate_full_price_total(product, count)
             total += product_total
         return total
+
+    def _calculate_discounted_total(self, offer: Offer, count: int) -> int:
+        offers_count = count // offer.count
+        full_price_count = count % offer.count
+        return offers_count * offer.price + self._calculate_full_price_total(offer.product, full_price_count)
+
+    def _calculate_full_price_total(self, product: Product, count: int) -> int:
+        return product.value * count
 
 
 def get_offers() -> Dict[Product, Offer]:
@@ -76,6 +76,7 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
 
