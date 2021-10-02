@@ -158,7 +158,8 @@ class GroupFixPrice(Discount):
         return discount
 
     def per_item(self) -> float:
-        return self.product.price - self.price / self.count
+        product = sorted_from_pricier_to_cheaper(self.products)[0]
+        return product.price - self.price / self.count
 
 
 @dataclass
@@ -254,5 +255,6 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
