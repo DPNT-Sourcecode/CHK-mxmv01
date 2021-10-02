@@ -69,7 +69,7 @@ class FixPrice(Discount):
         return discount
 
     def per_item(self) -> float:
-        pass
+        return self.product.value - self.price / self.count
 
 
 @dataclass
@@ -83,6 +83,9 @@ class GetFree(Discount):
             items[self.product] -= self.count
             discount = self.product.value * self.count
         return discount
+
+    def per_item(self) -> float:
+        return self.product.value
 
 
 @dataclass
@@ -102,7 +105,7 @@ class Offer:
         return discount > 0, discount
 
     def __lt__(self, other):
-        return self.discount < other.discount
+        return self.discount.per_item() < other.discount.per_item()
 
 
 class Basket:
@@ -162,12 +165,12 @@ class Basket:
 
 
 def get_offers() -> List[Offer]:
-    return [
+    return sorted([
         Offer(MultiBuy(Product.A, 3), FixPrice(Product.A, 3, 130)),
         Offer(MultiBuy(Product.A, 5), FixPrice(Product.A, 5, 200)),
         Offer(MultiBuy(Product.B, 2), FixPrice(Product.B, 2, 45)),
         Offer(MultiBuy(Product.E, 2), GetFree(Product.B, 1)),
-    ]
+    ], reverse=True)
 
 
 def checkout(skus: str):
@@ -186,6 +189,7 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
 
