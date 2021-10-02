@@ -182,7 +182,7 @@ def get_offers() -> List[Offer]:
         Offer(MultiBuy([(Product.P, 5)]), FixPrice(Product.P, 5, 200)),
         Offer(MultiBuy([(Product.Q, 3)]), FixPrice(Product.Q, 3, 80)),
         Offer(MultiBuy([(Product.R, 3), (Product.Q, 1)]), GetFree(Product.Q, 1)),
-        Offer(MultiBuy([(Product.U, 3)]), GetFree(Product.U, 1)),
+        Offer(MultiBuy([(Product.U, 4)]), GetFree(Product.U, 1)),
         Offer(MultiBuy([(Product.V, 2)]), FixPrice(Product.V, 2, 90)),
         Offer(MultiBuy([(Product.V, 3)]), FixPrice(Product.V, 3, 130)),
     ], reverse=True)
@@ -204,8 +204,3 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
-
-
-
-
-

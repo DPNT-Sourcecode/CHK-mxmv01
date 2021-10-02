@@ -32,4 +32,3 @@ class TestCheckout:
 
     def test_applies_cross_product_discount_first(self):
         assert checkout("EEBBBB") == 155
-
