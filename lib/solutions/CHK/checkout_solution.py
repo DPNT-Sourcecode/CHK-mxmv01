@@ -28,11 +28,10 @@ class Condition(ABC):
         pass
 
 
-class Multibuy(Condition):
-
-    def __init__(self, product: Product, count: int) -> None:
-        self.product = product
-        self.count = count
+@dataclass
+class MultiBuy(Condition):
+    product: Product
+    count: int
 
     def is_applicable(self, items: Dict[Product, int]) -> bool:
         return self.product in items and items[self.product] >= self.count
@@ -45,12 +44,11 @@ class Discount(ABC):
         pass
 
 
+@dataclass
 class FixPrice(Discount):
-
-    def __init__(self, product: Product, count: int, price: int) -> None:
-        self.product = product
-        self.count = count
-        self.price = price
+    product: Product
+    count: int
+    price: int
 
     def apply(self, items: Dict[Product, int]) -> int:
         discount = 0
@@ -60,11 +58,10 @@ class FixPrice(Discount):
         return discount
 
 
+@dataclass
 class GetFree(Discount):
-
-    def __init__(self, product: Product, count: int) -> None:
-        self.product = product
-        self.count = count
+    product: Product
+    count: int
 
     def apply(self, items: Dict[Product, int]) -> int:
         discount = 0
@@ -126,10 +123,13 @@ class Basket:
         return product.value * count
 
 
-def get_offers() -> Dict[Product, List[Offer]]:
-    return {Product.A: [Offer(Product.A, 5, 200), Offer(Product.A, 3, 130)],
-            Product.B: [Offer(Product.B, 2, 45)],
-            Product.E: [Offer(Product.E, 2, 40)]}
+def get_offers() -> List[Offer]:
+    return [
+        Offer(MultiBuy(Product.A, 3), FixPrice(Product.A, 3, 130)),
+        Offer(MultiBuy(Product.A, 5), FixPrice(Product.A, 5, 200)),
+        Offer(MultiBuy(Product.B, 2), FixPrice(Product.B, 2, 45)),
+        Offer(MultiBuy(Product.E, 2), GetFree(Product.B, 1)),
+    ]
 
 
 def checkout(skus: str):
@@ -148,6 +148,7 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
 
