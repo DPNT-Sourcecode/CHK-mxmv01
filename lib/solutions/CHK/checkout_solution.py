@@ -2,7 +2,7 @@
 # skus = unicode string
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, auto
 from typing import Generator, List, Dict, Tuple
 
 
@@ -91,11 +91,11 @@ class FixPrice(Discount):
     def apply(self, items: Dict[Product, int]) -> int:
         discount = 0
         if self.product in items and items[self.product] >= self.count:
-            discount = self.product.value * self.count - self.price
+            discount = self.product.price * self.count - self.price
         return discount
 
     def per_item(self) -> float:
-        return self.product.value - self.price / self.count
+        return self.product.price - self.price / self.count
 
 
 @dataclass
@@ -106,11 +106,11 @@ class GetFree(Discount):
     def apply(self, items: Dict[Product, int]) -> int:
         discount = 0
         if self.product in items and items[self.product] >= self.count:
-            discount = self.product.value * self.count
+            discount = self.product.price * self.count
         return discount
 
     def per_item(self) -> float:
-        return self.product.value
+        return self.product.price
 
 
 @dataclass
@@ -153,7 +153,7 @@ class Basket:
     def _calculate_total(self) -> int:
         total = 0
         for product, count in self.items.items():
-            total += product.value * count
+            total += product.price * count
         return total
 
     def _calculate_total_discount(self, offers: List[Offer]) -> int:
@@ -204,6 +204,7 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
 
