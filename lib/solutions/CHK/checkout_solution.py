@@ -72,7 +72,7 @@ class MultiBuy(Condition):
 
 
 def sorted_from_pricier_to_cheaper(products):
-    return sorted(products, key=lambda product: product.price, reverse=True)
+    return sorted(products, key=lambda product: product.price)
 
 
 @dataclass
@@ -255,6 +255,7 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
 
