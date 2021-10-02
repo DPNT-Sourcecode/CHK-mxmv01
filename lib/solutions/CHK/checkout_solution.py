@@ -13,6 +13,7 @@ class Product(IntEnum):
     C = 20
     D = 15
     E = 40
+    F = 10
 
 
 class UnknownProductException(Exception):
@@ -150,6 +151,7 @@ def get_offers() -> List[Offer]:
         Offer(MultiBuy([(Product.A, 5)]), FixPrice(Product.A, 5, 200)),
         Offer(MultiBuy([(Product.B, 2)]), FixPrice(Product.B, 2, 45)),
         Offer(MultiBuy([(Product.E, 2), (Product.B, 1)]), GetFree(Product.B, 1)),
+        Offer(MultiBuy([(Product.F, 3)]), GetFree(Product.F, 1)),
     ], reverse=True)
 
 
@@ -169,4 +171,5 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
