@@ -28,21 +28,30 @@ class Condition(ABC):
         pass
 
 
-class MultibuyCondition(ABC):
+class Multibuy(Condition):
+
+    def __init__(self, product: Product, count: int) -> None:
+        self.product = product
+        self.count = count
+
+    def is_applicable(self, items: Dict[Product, int]) -> bool:
+        return self.product in items and items[self.product] >= self.count
+
+
+class Discount(ABC):
+
+    @abstractmethod
+    def apply(self, items: Dict[Product, int]) -> int:
+        pass
+
+
+class FixPrice(Discount):
 
 
 
     def __init__(self) -> None:
         super().__init__()
 
-    @abstractmethod
-    def is_applicable(self, items: Dict[Product, int]) -> bool:
-        pass
-
-
-class Discount(ABC):
-
-    @abstractmethod
     def apply(self, items: Dict[Product, int]) -> int:
         pass
 
@@ -121,4 +130,5 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
