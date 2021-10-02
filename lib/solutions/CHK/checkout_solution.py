@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Generator, List, Dict, Tuple
 
+from functools import reduce
+
 
 class Product(Enum):
     A = 50
@@ -61,6 +63,24 @@ class MultiBuy(Condition):
     products: List[Tuple[Product, int]]
 
     def is_applicable(self, items: Dict[Product, int]) -> bool:
+        for product, count in self.products:
+            if product not in items or items[product] < count:
+                return False
+        return True
+
+    def applied(self, items: Dict[Product, int]) -> None:
+        for product, count in self.products:
+            items[product] -= count
+
+
+@dataclass
+class GroupBuy(Condition):
+    count: int
+    products: List[Product]
+
+    def is_applicable(self, items: Dict[Product, int]) -> bool:
+        present = reduce(lambda a, b: a + b, filter(lambda product, count: ))
+        for
         for product, count in self.products:
             if product not in items or items[product] < count:
                 return False
@@ -204,3 +224,4 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
