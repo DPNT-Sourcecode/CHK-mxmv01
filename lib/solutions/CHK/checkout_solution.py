@@ -90,7 +90,8 @@ class Offer:
         discount = 0
         if self.condition.is_applicable(items):
             discount = self.discount.apply(items)
-            self.condition.applied(items)
+            if discount > 0:
+                self.condition.applied(items)
         return discount
 
 
@@ -122,7 +123,7 @@ class Basket:
         discount = 0
         for offer in offers:
             while offer.is_applicable(items):
-                discount += offer.discount.apply(items)
+                discount += offer.apply(items)
         return discount
 
     # def calculate_total(self, offers: Dict[Product, List[Offer]]):
@@ -172,4 +173,5 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
