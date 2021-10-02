@@ -12,12 +12,8 @@ def checkout(skus: str):
     return 0
 
 
-class Good(Enum):
-    A = "A"
-    B = "B"
-    C = "C"
-    D = "D"
-
+class Good(str):
+    pass
 
 class Basket:
 
@@ -30,3 +26,4 @@ class Basket:
             count = 0
         count += 1
         self.items[good] = count
+
