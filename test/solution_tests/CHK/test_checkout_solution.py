@@ -32,3 +32,10 @@ class TestCheckout:
 
     def test_applies_cross_product_discount_first(self):
         assert checkout("EEBBBB") == 155
+
+    def test_applies_group_discount_to_different_products(self):
+        assert checkout("STXY") == 62
+
+    def test_applies_group_discount_to_pricier_products_first(self):
+        assert checkout("XYZZ") == 62
+
