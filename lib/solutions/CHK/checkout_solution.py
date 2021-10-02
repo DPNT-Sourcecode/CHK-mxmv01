@@ -27,6 +27,10 @@ class Condition(ABC):
     def is_applicable(self, items: Dict[Product, int]) -> bool:
         pass
 
+    @abstractmethod
+    def applied(self, items: Dict[Product, int]):
+        pass
+
 
 @dataclass
 class MultiBuy(Condition):
@@ -35,6 +39,9 @@ class MultiBuy(Condition):
 
     def is_applicable(self, items: Dict[Product, int]) -> bool:
         return self.product in items and items[self.product] >= self.count
+
+    def applied(self, items: Dict[Product, int]) -> None:
+        items[self.product] -= self.count
 
 
 class Discount(ABC):
@@ -80,7 +87,11 @@ class Offer:
         return self.condition.is_applicable(items)
 
     def apply(self, items: Dict[Product, int]) -> int:
-        return self.discount.apply(items)
+        discount = 0
+        if self.condition.is_applicable(items):
+            discount = self.discount.apply(items)
+            self.condition.applied(items)
+        return discount
 
 
 class Basket:
@@ -161,3 +172,4 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
