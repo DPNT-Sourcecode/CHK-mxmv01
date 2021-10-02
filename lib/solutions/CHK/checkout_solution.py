@@ -38,7 +38,7 @@ class Basket:
         count += 1
         self.items[product] = count
 
-    def calculate_total(self, offers: Dict[Product, Offer]):
+    def calculate_total(self, offers: [Offer]):
         total = 0
         for product, count in self.items.items():
             if product in offers:
@@ -58,7 +58,7 @@ class Basket:
 
 
 def get_offers() -> List[Offer]:
-    return [Offer(Product.A, 5, 130), Offer(Product.A, 3, 130), Offer(Product.B, 2, 45)]
+    return [Offer(Product.A, 5, 200), Offer(Product.A, 3, 130), Offer(Product.B, 2, 45), Offer(Product.E, 2, 20)]
 
 
 def checkout(skus: str):
@@ -77,4 +77,5 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
