@@ -18,5 +18,8 @@ class TestCheckout:
     def test_calculates_sum_correctly(self):
         assert checkout("ABCDACD") == 200
 
+    def test_applies_discount(self):
+        assert checkout("AAABB") == 175
 
-
+    def test_applies_discount_to_correct_number_of_product(self):
+        assert checkout("AAAAABBB") == 305
