@@ -28,7 +28,7 @@ class Offer:
 
 class Basket:
 
-    def __init__(self) -> None:
+    def __init__(self, offers: Dict[Product, List[Offer]]) -> None:
         self.items = {}
 
     def add_item(self, product: Product):
@@ -37,6 +37,18 @@ class Basket:
             count = 0
         count += 1
         self.items[product] = count
+
+    def checkout(self):
+        total = self._calculate_total()
+
+    def _calculate_total(self):
+        total = 0
+        for product, count in self.items.items():
+            total += product.value * count
+        return total
+
+    def _calculate_discount(self):
+        pass
 
     def calculate_total(self, offers: Dict[Product, List[Offer]]):
         total = 0
@@ -82,3 +94,4 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
