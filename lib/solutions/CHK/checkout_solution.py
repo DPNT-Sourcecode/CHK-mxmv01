@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import Generator, List, Dict
 
+from abc import ABC, abstractmethod
+
 
 class Product(IntEnum):
     A = 50
@@ -19,17 +21,42 @@ class UnknownProductException(Exception):
         super().__init__(f"Unknown product found: {name}")
 
 
+class Condition(ABC):
+
+    @abstractmethod
+    def is_applicable(self, items: Dict[Product, int]) -> bool:
+        pass
+
+
+class MultibuyCondition(ABC):
+
+
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    @abstractmethod
+    def is_applicable(self, items: Dict[Product, int]) -> bool:
+        pass
+
+
+class Discount(ABC):
+
+    @abstractmethod
+    def apply(self, items: Dict[Product, int]) -> int:
+        pass
+
+
 @dataclass
 class Offer:
-    product: Product
-    count: int
-    price: int
+    condition: Condition
+    discount: Discount
 
 
 class Basket:
 
     def __init__(self) -> None:
-        self.items = {}
+        self.items: Dict[Product, int] = {}
 
     def add_item(self, product: Product):
         count = self.items.get(product)
@@ -94,3 +121,4 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
