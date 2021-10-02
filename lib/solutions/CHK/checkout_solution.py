@@ -63,7 +63,7 @@ class Basket:
 def get_offers() -> Dict[Product, List[Offer]]:
     return {Product.A: [Offer(Product.A, 5, 200), Offer(Product.A, 3, 130)],
             Product.B: [Offer(Product.B, 2, 45)],
-            Product.E: [Offer(Product.E, 2, 20)]}
+            Product.E: [Offer(Product.E, 2, 40)]}
 
 
 def checkout(skus: str):
@@ -82,6 +82,3 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
-
-
-

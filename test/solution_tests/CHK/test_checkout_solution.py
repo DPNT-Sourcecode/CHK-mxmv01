@@ -27,5 +27,5 @@ class TestCheckout:
     def test_applies_bigger_discounts_before_smaller(self):
         assert checkout("AAAAAAAAA") == 380
 
-
-
+    def test_one_for_free(self):
+        assert checkout("EE") == 40
