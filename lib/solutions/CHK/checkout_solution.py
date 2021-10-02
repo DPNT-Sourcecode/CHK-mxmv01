@@ -1,10 +1,8 @@
 # noinspection PyUnusedLocal
 # skus = unicode string
-from enum import IntEnum
-
-from typing import Generator, List, Dict
-
 from dataclasses import dataclass
+from enum import IntEnum
+from typing import Generator, Dict
 
 
 class Product(IntEnum):
@@ -23,13 +21,8 @@ class UnknownProductException(Exception):
 @dataclass
 class Offer:
     product: Product
-    offer_count: int
+    count: int
     price: int
-
-    def calculate_total(self, product_count) -> int:
-        offers_count = product_count // self.offer_count
-        full_price_count = product_count % self.offer_count
-        return offers_count * self.price + full_price_count * self.product.value
 
 
 class Basket:
@@ -44,15 +37,23 @@ class Basket:
         count += 1
         self.items[product] = count
 
+    def calculate_discounted_total(self, offer: Offer, count: int) -> int:
+        offers_count = count // offer.count
+        full_price_count = count % offer.count
+        return offers_count * offer.price + self.calculate_full_price_total(offer.product, full_price_count)
+
+    def calculate_full_price_total(self, product: Product, count: int) -> int:
+        return product.value * count
+
     def calculate_total(self, offers: Dict[Product, Offer]):
-        basket_total = 0
+        total = 0
         for product, count in self.items.items():
             if product in offers:
-                product_total = offers[product].calculate_total(count)
+                product_total = self.calculate_discounted_total(offers[product], count)
             else:
-                product_total = product.value * count
-            basket_total += product_total
-        return basket_total
+                product_total = self.calculate_full_price_total(product, count)
+            total += product_total
+        return total
 
 
 def get_offers() -> Dict[Product, Offer]:
@@ -75,5 +76,6 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
