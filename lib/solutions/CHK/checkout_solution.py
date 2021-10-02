@@ -34,14 +34,17 @@ class Condition(ABC):
 
 @dataclass
 class MultiBuy(Condition):
-    product: Product
-    count: int
+    products: List[Tuple[Product, int]]
 
     def is_applicable(self, items: Dict[Product, int]) -> bool:
-        return self.product in items and items[self.product] >= self.count
+        for product, count in self.products:
+            if product not in items or items[product] < count:
+                return False
+        return True
 
     def applied(self, items: Dict[Product, int]) -> None:
-        items[self.product] -= self.count
+        for product, count in self.products:
+            items[product] -= count
 
 
 class Discount(ABC):
@@ -64,7 +67,6 @@ class FixPrice(Discount):
     def apply(self, items: Dict[Product, int]) -> int:
         discount = 0
         if self.product in items and items[self.product] >= self.count:
-            items[self.product] -= self.count
             discount = self.product.value * self.count - self.price
         return discount
 
@@ -80,7 +82,6 @@ class GetFree(Discount):
     def apply(self, items: Dict[Product, int]) -> int:
         discount = 0
         if self.product in items and items[self.product] >= self.count:
-            items[self.product] -= self.count
             discount = self.product.value * self.count
         return discount
 
@@ -142,34 +143,13 @@ class Basket:
                 total_discount += discount
         return total_discount
 
-    # def calculate_total(self, offers: Dict[Product, List[Offer]]):
-    #     total = 0
-    #     for product, count in self.items.items():
-    #         if product in offers:
-    #             product_total = self._calculate_discounted_total(product, offers[product], count)
-    #         else:
-    #             product_total = self._calculate_full_price_total(product, count)
-    #         total += product_total
-    #     return total
-    #
-    # def _calculate_discounted_total(self, product: Product, offers: List[Offer], count: int) -> int:
-    #     product_total = 0
-    #     for offer in offers:
-    #         product_total += count // offer.count * offer.price
-    #         count = count % offer.count
-    #     product_total += self._calculate_full_price_total(product, count)
-    #     return product_total
-    #
-    # def _calculate_full_price_total(self, product: Product, count: int) -> int:
-    #     return product.value * count
-
 
 def get_offers() -> List[Offer]:
     return sorted([
-        Offer(MultiBuy(Product.A, 3), FixPrice(Product.A, 3, 130)),
-        Offer(MultiBuy(Product.A, 5), FixPrice(Product.A, 5, 200)),
-        Offer(MultiBuy(Product.B, 2), FixPrice(Product.B, 2, 45)),
-        Offer(MultiBuy(Product.E, 2), GetFree(Product.B, 1)),
+        Offer(MultiBuy([(Product.A, 3)]), FixPrice(Product.A, 3, 130)),
+        Offer(MultiBuy([(Product.A, 5)]), FixPrice(Product.A, 5, 200)),
+        Offer(MultiBuy([(Product.B, 2)]), FixPrice(Product.B, 2, 45)),
+        Offer(MultiBuy([(Product.E, 2), (Product.B, 1)]), GetFree(Product.B, 1)),
     ], reverse=True)
 
 
@@ -189,3 +169,4 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
