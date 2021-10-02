@@ -1,13 +1,13 @@
 # noinspection PyUnusedLocal
 # skus = unicode string
 from dataclasses import dataclass
-from enum import IntEnum
+from enum import IntEnum, Enum
 from typing import Generator, List, Dict, Tuple
 
 from abc import ABC, abstractmethod
 
 
-class Product(IntEnum):
+class Product(Enum):
     A = 50
     B = 30
     C = 20
@@ -34,6 +34,9 @@ class Product(IntEnum):
     X = 90
     Y = 10
     Z = 50
+
+    def __init__(self) -> None:
+        super().__init__()
 
 
 class UnknownProductException(Exception):
@@ -201,4 +204,5 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
