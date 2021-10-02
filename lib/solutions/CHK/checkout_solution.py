@@ -2,7 +2,7 @@
 # skus = unicode string
 from enum import IntEnum
 
-from typing import Generator, List
+from typing import Generator, List, Dict
 
 from dataclasses import dataclass
 
@@ -23,8 +23,13 @@ class UnknownProductException(Exception):
 @dataclass
 class Offer:
     product: Product
-    count: int
+    offer_count: int
     price: int
+
+    def calculate_total(self, product_count) -> int:
+        offers_count = product_count // self.offer_count
+        full_price_count = product_count % self.offer_count
+        return offers_count * self.price + full_price_count * self.product.value
 
 
 class Basket:
@@ -39,15 +44,19 @@ class Basket:
         count += 1
         self.items[product] = count
 
-    def calculate_total(self):
-        total = 0
+    def calculate_total(self, offers: Dict[Product, Offer]):
+        basket_total = 0
         for product, count in self.items.items():
-            total += product.value * count
-        return total
+            if product in offers:
+                product_total = offers[product].calculate_total(count)
+            else:
+                product_total = product.value * count
+            basket_total += product_total
+        return basket_total
 
 
-def get_offers() -> List[Offer]:
-    return [Offer(Product.A, )]
+def get_offers() -> Dict[Product, Offer]:
+    return {offer.product: offer for offer in [Offer(Product.A, 3, 130), Offer(Product.B, 2, 45)]}
 
 
 def checkout(skus: str):
@@ -57,7 +66,7 @@ def checkout(skus: str):
             basket.add_item(product)
     except UnknownProductException:
         return -1
-    return basket.calculate_total()
+    return basket.calculate_total(get_offers())
 
 
 def parse_products(skus: str) -> Generator[Product, None, None]:
@@ -66,4 +75,5 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
