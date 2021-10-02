@@ -10,6 +10,13 @@ class TestCheckout:
         assert checkout("A") == 50
 
     def test_unknown_goods(self):
-        assert checkout("x") == -1
+        assert checkout("X") == -1
+
+    def test_invalid_input(self):
+        assert checkout("-") == -1
+
+    def test_calculates_sum_correctly(self):
+        assert checkout("ABCDACD") == 200
+
 
 
