@@ -7,8 +7,11 @@ from typing import Generator
 
 def checkout(skus: str):
     basket = Basket()
-    for goods in parse_goods(skus):
-        basket.add_item(goods)
+    try:
+        for goods in parse_goods(skus):
+            basket.add_item(goods)
+    except UnknownGoodException:
+        return -1
     return basket.calculate_total()
 
 
@@ -19,9 +22,18 @@ class Goods(IntEnum):
     D = 15
 
 
+class UnknownGoodException(Exception):
+
+    def __init__(self, name: str) -> None:
+        super().__init__(f"Unknown goods found: {name}")
+
+
 def parse_goods(skus: str) -> Generator[Goods, None, None]:
     for sku in list(skus):
-        yield Goods[sku]
+        try:
+            yield Goods[sku]
+        except KeyError:
+            raise UnknownGoodException(sku)
 
 
 class Basket:
@@ -41,6 +53,7 @@ class Basket:
         for goods, count in self.items.items():
             total += goods.value * count
         return total
+
 
 
 
