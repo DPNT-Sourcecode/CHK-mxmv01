@@ -2,7 +2,9 @@
 # skus = unicode string
 from enum import IntEnum
 
-from typing import Generator
+from typing import Generator, List
+
+from dataclasses import dataclass
 
 
 class Product(IntEnum):
@@ -16,6 +18,13 @@ class UnknownProductException(Exception):
 
     def __init__(self, name: str) -> None:
         super().__init__(f"Unknown product found: {name}")
+
+
+@dataclass
+class Offer:
+    product: Product
+    count: int
+    price: int
 
 
 class Basket:
@@ -37,6 +46,10 @@ class Basket:
         return total
 
 
+def get_offers() -> List[Offer]:
+    return [Offer(Product.A, )]
+
+
 def checkout(skus: str):
     basket = Basket()
     try:
@@ -53,3 +66,4 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
