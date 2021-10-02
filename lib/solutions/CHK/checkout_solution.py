@@ -59,7 +59,7 @@ class Condition(ABC):
 
 
 @dataclass
-class MultiCondition(Condition):
+class MultiBuy(Condition):
     products: List[Tuple[Product, int]]
 
     def is_applicable(self, items: Dict[Product, int]) -> bool:
@@ -87,11 +87,14 @@ class GroupBuy(Condition):
 
     def applied(self, items: Dict[Product, int]) -> None:
         applied = 0
-        for product in sorted(self.products, key=lambda product: product.price, reverse=True):
+        for product in self.sorted_from_pricier_to_cheaper():
             if product in items:
                 while items[product] > 0 and applied < self.count:
                     items[product] -= 1
                     applied += 1
+
+    def sorted_from_pricier_to_cheaper(self):
+        return sorted(self.products, key=lambda product: product.price, reverse=True)
 
 
 class Discount(ABC):
@@ -134,6 +137,22 @@ class GetFree(Discount):
 
     def per_item(self) -> float:
         return self.product.price
+
+
+@dataclass
+class GroupFixPrice(Discount):
+    products: List[Product]
+    count: int
+    price: int
+
+    def apply(self, items: Dict[Product, int]) -> int:
+        discount = 0
+        if self.product in items and items[self.product] >= self.count:
+            discount = self.product.price * self.count - self.price
+        return discount
+
+    def per_item(self) -> float:
+        return self.product.price - self.price / self.count
 
 
 @dataclass
@@ -193,21 +212,21 @@ class Basket:
 
 def get_offers() -> List[Offer]:
     return sorted([
-        Offer(MultiCondition([(Product.A, 3)]), FixPrice(Product.A, 3, 130)),
-        Offer(MultiCondition([(Product.A, 5)]), FixPrice(Product.A, 5, 200)),
-        Offer(MultiCondition([(Product.B, 2)]), FixPrice(Product.B, 2, 45)),
-        Offer(MultiCondition([(Product.E, 2), (Product.B, 1)]), GetFree(Product.B, 1)),
-        Offer(MultiCondition([(Product.F, 3)]), GetFree(Product.F, 1)),
-        Offer(MultiCondition([(Product.H, 5)]), FixPrice(Product.H, 5, 45)),
-        Offer(MultiCondition([(Product.H, 10)]), FixPrice(Product.H, 10, 80)),
-        Offer(MultiCondition([(Product.K, 2)]), FixPrice(Product.K, 2, 150)),
-        Offer(MultiCondition([(Product.N, 3), (Product.M, 1)]), GetFree(Product.M, 1)),
-        Offer(MultiCondition([(Product.P, 5)]), FixPrice(Product.P, 5, 200)),
-        Offer(MultiCondition([(Product.Q, 3)]), FixPrice(Product.Q, 3, 80)),
-        Offer(MultiCondition([(Product.R, 3), (Product.Q, 1)]), GetFree(Product.Q, 1)),
-        Offer(MultiCondition([(Product.U, 4)]), GetFree(Product.U, 1)),
-        Offer(MultiCondition([(Product.V, 2)]), FixPrice(Product.V, 2, 90)),
-        Offer(MultiCondition([(Product.V, 3)]), FixPrice(Product.V, 3, 130)),
+        Offer(MultiBuy([(Product.A, 3)]), FixPrice(Product.A, 3, 130)),
+        Offer(MultiBuy([(Product.A, 5)]), FixPrice(Product.A, 5, 200)),
+        Offer(MultiBuy([(Product.B, 2)]), FixPrice(Product.B, 2, 45)),
+        Offer(MultiBuy([(Product.E, 2), (Product.B, 1)]), GetFree(Product.B, 1)),
+        Offer(MultiBuy([(Product.F, 3)]), GetFree(Product.F, 1)),
+        Offer(MultiBuy([(Product.H, 5)]), FixPrice(Product.H, 5, 45)),
+        Offer(MultiBuy([(Product.H, 10)]), FixPrice(Product.H, 10, 80)),
+        Offer(MultiBuy([(Product.K, 2)]), FixPrice(Product.K, 2, 150)),
+        Offer(MultiBuy([(Product.N, 3), (Product.M, 1)]), GetFree(Product.M, 1)),
+        Offer(MultiBuy([(Product.P, 5)]), FixPrice(Product.P, 5, 200)),
+        Offer(MultiBuy([(Product.Q, 3)]), FixPrice(Product.Q, 3, 80)),
+        Offer(MultiBuy([(Product.R, 3), (Product.Q, 1)]), GetFree(Product.Q, 1)),
+        Offer(MultiBuy([(Product.U, 4)]), GetFree(Product.U, 1)),
+        Offer(MultiBuy([(Product.V, 2)]), FixPrice(Product.V, 2, 90)),
+        Offer(MultiBuy([(Product.V, 3)]), FixPrice(Product.V, 3, 130)),
     ], reverse=True)
 
 
@@ -227,3 +246,4 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
