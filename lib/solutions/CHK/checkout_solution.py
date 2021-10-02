@@ -2,7 +2,7 @@
 # skus = unicode string
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Generator, List, Dict
+from typing import Generator, List, Dict, Tuple
 
 from abc import ABC, abstractmethod
 
@@ -86,13 +86,13 @@ class Offer:
     def is_applicable(self, items: Dict[Product, int]) -> bool:
         return self.condition.is_applicable(items)
 
-    def apply(self, items: Dict[Product, int]) -> int:
+    def apply(self, items: Dict[Product, int]) -> Tuple[bool, int]:
         discount = 0
         if self.condition.is_applicable(items):
             discount = self.discount.apply(items)
             if discount > 0:
                 self.condition.applied(items)
-        return discount
+        return discount > 0, discount
 
 
 class Basket:
@@ -109,7 +109,7 @@ class Basket:
 
     def checkout(self, offers: List[Offer]) -> int:
         total = self._calculate_total()
-        discount = self._calculate_discount(offers)
+        discount = self._calculate_total_discount(offers)
         return total - discount
 
     def _calculate_total(self) -> int:
@@ -118,13 +118,16 @@ class Basket:
             total += product.value * count
         return total
 
-    def _calculate_discount(self, offers: List[Offer]) -> int:
+    def _calculate_total_discount(self, offers: List[Offer]) -> int:
         items = self.items.copy()
-        discount = 0
+        total_discount = 0
         for offer in offers:
             while offer.is_applicable(items):
-                discount += offer.apply(items)
-        return discount
+                applied, discount = offer.apply(items)
+                if not applied:
+                    break
+                total_discount += discount
+        return total_discount
 
     # def calculate_total(self, offers: Dict[Product, List[Offer]]):
     #     total = 0
@@ -173,5 +176,6 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
