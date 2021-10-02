@@ -2,7 +2,7 @@
 # skus = unicode string
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Generator, Dict, List
+from typing import Generator, List, Dict
 
 
 class Product(IntEnum):
@@ -38,27 +38,32 @@ class Basket:
         count += 1
         self.items[product] = count
 
-    def calculate_total(self, offers: [Offer]):
+    def calculate_total(self, offers: Dict[Product, List[Offer]]):
         total = 0
         for product, count in self.items.items():
             if product in offers:
-                product_total = self._calculate_discounted_total(offers[product], count)
+                product_total = self._calculate_discounted_total(product, offers[product], count)
             else:
                 product_total = self._calculate_full_price_total(product, count)
             total += product_total
         return total
 
-    def _calculate_discounted_total(self, offer: Offer, count: int) -> int:
-        offers_count = count // offer.count
-        full_price_count = count % offer.count
-        return offers_count * offer.price + self._calculate_full_price_total(offer.product, full_price_count)
+    def _calculate_discounted_total(self, product: Product, offers: List[Offer], count: int) -> int:
+        product_total = 0
+        for offer in offers:
+            product_total += count // offer.count * offer.price
+            count = count % offer.count
+        product_total += self._calculate_full_price_total(product, count)
+        return product_total
 
     def _calculate_full_price_total(self, product: Product, count: int) -> int:
         return product.value * count
 
 
-def get_offers() -> List[Offer]:
-    return [Offer(Product.A, 5, 200), Offer(Product.A, 3, 130), Offer(Product.B, 2, 45), Offer(Product.E, 2, 20)]
+def get_offers() -> Dict[Product, List[Offer]]:
+    return {Product.A: [Offer(Product.A, 5, 200), Offer(Product.A, 3, 130)],
+            Product.B: [Offer(Product.B, 2, 45)],
+            Product.E: [Offer(Product.E, 2, 20)]}
 
 
 def checkout(skus: str):
@@ -77,5 +82,6 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
