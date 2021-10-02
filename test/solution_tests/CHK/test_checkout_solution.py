@@ -27,9 +27,13 @@ class TestCheckout:
     def test_applies_bigger_discounts_before_smaller(self):
         assert checkout("AAAAAAAAA") == 380
 
-    def test_one_for_free(self):
+    def test_without_discounted_items(self):
         assert checkout("EE") == 80
 
-    def test_one_for_free(self):
-        assert checkout("EE") == 80
+    def test_with_discounted_items(self):
+        assert checkout("EEB") == 80
+
+    def test_applies_cross_product_discount_first(self):
+        assert checkout("EEBBBB") == 155
+
 
