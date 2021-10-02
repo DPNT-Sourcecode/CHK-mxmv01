@@ -35,7 +35,8 @@ class Product(Enum):
     Z = 50
 
     def __init__(self, price: int) -> None:
-        self._value_ = price
+        self._value_ = auto()
+        self.price = price
 
 
 class UnknownProductException(Exception):
@@ -203,6 +204,7 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
 
