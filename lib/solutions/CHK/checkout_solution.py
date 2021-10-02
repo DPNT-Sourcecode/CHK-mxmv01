@@ -83,11 +83,15 @@ class GroupBuy(Condition):
         for product, count in items.items():
             if product in self.products:
                 present += count
-        return present >= count
+        return present >= self.count
 
     def applied(self, items: Dict[Product, int]) -> None:
-        for product in sorted(self.products, lambda product: ):
-            items[product] -= count
+        applied = 0
+        for product in sorted(self.products, key=lambda product: product.price, reverse=True):
+            if product in items:
+                while items[product] > 0 and applied < self.count:
+                    items[product] -= 1
+                    applied += 1
 
 
 class Discount(ABC):
@@ -223,5 +227,6 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
