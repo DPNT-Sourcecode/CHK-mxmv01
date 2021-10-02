@@ -28,7 +28,7 @@ class Offer:
 
 class Basket:
 
-    def __init__(self, offers: Dict[Product, List[Offer]]) -> None:
+    def __init__(self) -> None:
         self.items = {}
 
     def add_item(self, product: Product):
@@ -94,4 +94,5 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
