@@ -79,15 +79,14 @@ class GroupBuy(Condition):
     products: List[Product]
 
     def is_applicable(self, items: Dict[Product, int]) -> bool:
-        present = reduce(lambda a, b: a + b, filter(lambda product, count: ))
-        for
-        for product, count in self.products:
-            if product not in items or items[product] < count:
-                return False
-        return True
+        present = 0
+        for product, count in items.items():
+            if product in self.products:
+                present += count
+        return present >= count
 
     def applied(self, items: Dict[Product, int]) -> None:
-        for product, count in self.products:
+        for product in sorted(self.products, lambda product: ):
             items[product] -= count
 
 
@@ -224,4 +223,5 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
