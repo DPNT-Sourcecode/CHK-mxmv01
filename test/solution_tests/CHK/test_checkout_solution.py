@@ -28,4 +28,8 @@ class TestCheckout:
         assert checkout("AAAAAAAAA") == 380
 
     def test_one_for_free(self):
-        assert checkout("EE") == 40
+        assert checkout("EE") == 80
+
+    def test_one_for_free(self):
+        assert checkout("EE") == 80
+
