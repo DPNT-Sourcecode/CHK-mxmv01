@@ -14,6 +14,26 @@ class Product(IntEnum):
     D = 15
     E = 40
     F = 10
+    G = 20
+    H = 10
+    I = 35
+    J = 60
+    K = 80
+    L = 90
+    M = 15
+    N = 40
+    O = 10
+    P = 50
+    Q = 30
+    R = 50
+    S = 30
+    T = 20
+    U = 40
+    V = 50
+    W = 20
+    X = 90
+    Y = 10
+    Z = 50
 
 
 class UnknownProductException(Exception):
@@ -152,6 +172,16 @@ def get_offers() -> List[Offer]:
         Offer(MultiBuy([(Product.B, 2)]), FixPrice(Product.B, 2, 45)),
         Offer(MultiBuy([(Product.E, 2), (Product.B, 1)]), GetFree(Product.B, 1)),
         Offer(MultiBuy([(Product.F, 3)]), GetFree(Product.F, 1)),
+        Offer(MultiBuy([(Product.H, 5)]), FixPrice(Product.H, 5, 45)),
+        Offer(MultiBuy([(Product.H, 10)]), FixPrice(Product.H, 10, 80)),
+        Offer(MultiBuy([(Product.K, 2)]), FixPrice(Product.K, 2, 150)),
+        Offer(MultiBuy([(Product.N, 3), (Product.M, 1)]), GetFree(Product.M, 1)),
+        Offer(MultiBuy([(Product.P, 5)]), FixPrice(Product.P, 5, 200)),
+        Offer(MultiBuy([(Product.Q, 3)]), FixPrice(Product.Q, 3, 80)),
+        Offer(MultiBuy([(Product.R, 3), (Product.Q, 1)]), GetFree(Product.Q, 1)),
+        Offer(MultiBuy([(Product.U, 3)]), GetFree(Product.U, 1)),
+        Offer(MultiBuy([(Product.V, 2)]), FixPrice(Product.V, 2, 90)),
+        Offer(MultiBuy([(Product.V, 3)]), FixPrice(Product.V, 3, 130)),
     ], reverse=True)
 
 
@@ -171,3 +201,4 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
