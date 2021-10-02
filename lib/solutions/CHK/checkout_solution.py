@@ -94,7 +94,8 @@ class Offer:
                 self.condition.applied(items)
         return discount > 0, discount
 
-
+    def __lt__(self, other):
+        return self.discount 
 
 
 class Basket:
@@ -178,6 +179,7 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
 
