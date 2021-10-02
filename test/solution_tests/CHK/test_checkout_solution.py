@@ -9,9 +9,6 @@ class TestCheckout:
     def test_one_goods(self):
         assert checkout("A") == 50
 
-    def test_unknown_goods(self):
-        assert checkout("X") == -1
-
     def test_invalid_input(self):
         assert checkout("-") == -1
 
@@ -35,3 +32,4 @@ class TestCheckout:
 
     def test_applies_cross_product_discount_first(self):
         assert checkout("EEBBBB") == 155
+
