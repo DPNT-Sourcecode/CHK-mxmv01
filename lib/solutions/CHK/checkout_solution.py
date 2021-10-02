@@ -47,13 +47,31 @@ class Discount(ABC):
 
 class FixPrice(Discount):
 
-
-
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, product: Product, count: int, price: int) -> None:
+        self.product = product
+        self.count = count
+        self.price = price
 
     def apply(self, items: Dict[Product, int]) -> int:
-        pass
+        discount = 0
+        if self.product in items and items[self.product] >= self.count:
+            items[self.product] -= self.count
+            discount = self.product.value * self.count - self.price
+        return discount
+
+
+class GetFree(Discount):
+
+    def __init__(self, product: Product, count: int) -> None:
+        self.product = product
+        self.count = count
+
+    def apply(self, items: Dict[Product, int]) -> int:
+        discount = 0
+        if self.product in items and items[self.product] >= self.count:
+            items[self.product] -= self.count
+            discount = self.product.value * self.count
+        return discount
 
 
 @dataclass
@@ -130,5 +148,6 @@ def parse_products(skus: str) -> Generator[Product, None, None]:
             yield Product[sku]
         except KeyError:
             raise UnknownProductException(sku)
+
 
 
